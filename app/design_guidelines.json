@@ -1,0 +1,112 @@
+{
+  "identity": {
+    "name": "Mess & Business Finance Tracker",
+    "persona": "E1 - The Anti-AI Designer",
+    "archetype": "Swiss & Organic (Structured but Human)",
+    "tone": "Professional, Trustworthy, Efficient, Clean"
+  },
+  "typography": {
+    "font_family": {
+      "headings": "Manrope, sans-serif",
+      "body": "Inter, sans-serif",
+      "data": "JetBrains Mono, monospace"
+    },
+    "scale": {
+      "h1": "text-4xl md:text-5xl font-bold tracking-tight",
+      "h2": "text-3xl font-semibold tracking-tight",
+      "h3": "text-2xl font-semibold",
+      "body": "text-base leading-relaxed",
+      "small": "text-sm text-muted-foreground",
+      "data": "text-sm font-mono tracking-wide"
+    }
+  },
+  "colors": {
+    "mode": "light",
+    "palette": {
+      "background": "#FAFAFA",
+      "surface": "#FFFFFF",
+      "primary": "#0F172A",
+      "primary_foreground": "#F8FAFC",
+      "secondary": "#F1F5F9",
+      "secondary_foreground": "#0F172A",
+      "muted": "#F4F4F5",
+      "muted_foreground": "#71717A",
+      "accent": "#F5F5F4",
+      "border": "#E4E4E7",
+      "success": "#10B981",
+      "error": "#EF4444",
+      "warning": "#F59E0B",
+      "info": "#3B82F6"
+    },
+    "gradients": {
+      "primary": "none",
+      "surface": "linear-gradient(180deg, #FFFFFF 0%, #FAFAFA 100%)"
+    }
+  },
+  "spacing": {
+    "container_padding": "p-6 md:p-8 lg:p-12",
+    "element_gap": "gap-6 md:gap-8",
+    "card_padding": "p-6"
+  },
+  "layout_strategy": {
+    "dashboard": "Bento Grid (Mode B: High Density)",
+    "sidebar": "Fixed left sidebar, dark theme (#0F172A) for high contrast",
+    "content_area": "Light theme, card-based layout",
+    "tables": "Clean lines, no vertical borders, generous row padding (py-4)"
+  },
+  "components": {
+    "buttons": {
+      "style": "rounded-lg font-medium transition-all active:scale-95",
+      "primary": "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm",
+      "secondary": "bg-white border border-input hover:bg-accent hover:text-accent-foreground shadow-sm"
+    },
+    "cards": {
+      "style": "bg-white rounded-xl border border-border/50 shadow-sm hover:shadow-md transition-shadow duration-200"
+    },
+    "inputs": {
+      "style": "rounded-lg border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+    }
+  },
+  "visual_enhancers": {
+    "shadows": "shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]",
+    "borders": "1px solid #E4E4E7",
+    "glassmorphism": "backdrop-blur-md bg-white/80 border-white/20 (Use sparingly for sticky headers)",
+    "empty_states": "Use minimalist geometric shapes or clean typography"
+  },
+  "assets": {
+    "image_urls": {
+      "login_bg": "https://images.unsplash.com/photo-1658901167484-48bf77a5c305?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "dashboard_empty": "https://images.unsplash.com/photo-1629981892096-76ee7793ba0b?crop=entropy&cs=srgb&fm=jpg&q=85"
+    },
+    "icons": {
+      "library": "lucide-react",
+      "style": "Stroke width 1.5px or 2px, clean"
+    }
+  },
+  "accessibility": {
+    "contrast": "Ensure WCAG AA compliance. Use text-slate-900 for main text, text-slate-500 for secondary.",
+    "focus_states": "Visible ring-2 ring-primary ring-offset-2",
+    "test_ids": "All interactive elements must have data-testid"
+  },
+  "instructions_to_main_agent": [
+    "Install 'clsx' and 'tailwind-merge' for dynamic classes if not present.",
+    "Use 'recharts' for all charts. Keep them simple: 2D, minimal grid lines.",
+    "For the 'Mess' aspect, ensure the 'Individual Contributions' section in Revenue is easy to edit (inline editing).",
+    "Daily Report should be a 'Read Only' generated view with distinct visual separation from entry forms.",
+    "Use 'sonner' for toast notifications on success/error.",
+    "Implement a 'Bento Grid' for the Dashboard Home: Key Metrics (Top), Revenue Chart (Middle Left), Category Pie (Middle Right), Recent Activity (Bottom).",
+    "Ensure the Sidebar collapses on mobile to a hamburger menu.",
+    "Use 'Manrope' font for all headings to give it a distinct personality. Import via Google Fonts.",
+    "Use 'JetBrains Mono' for all financial data displayed in tables or summaries."
+  ],
+  "UNIVERSAL_GUIDELINES": [
+    "Do not use gradients for text.",
+    "Don't make generic centered layouts.",
+    "Create depth through layered design elements with z-index hierarchy.",
+    "Every interaction needs micro-animations - hover states, transitions.",
+    "Use 2-3x more spacing than feels comfortable.",
+    "Prioritize using pre-existing components from src/components/ui.",
+    "Components MUST use named exports.",
+    "Pages MUST use default exports."
+  ]
+}
