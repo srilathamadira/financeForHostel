@@ -20,7 +20,7 @@ const EXTENSIONS = [".tsx", ".ts", ".jsx", ".js"];
 function resolveSourceFile(source, frontendRoot) {
   let base;
 
-  if (source.startsWith("@/")) {
+  if (source.startsWith("./")) {
     base = path.join(frontendRoot, "src", source.slice(2));
   } else if (source.startsWith("./") || source.startsWith("../")) {
     base = path.resolve(frontendRoot, "src", source);

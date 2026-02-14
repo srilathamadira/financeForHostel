@@ -1,8 +1,8 @@
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useState } from 'react';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 import { LayoutDashboard, DollarSign, Receipt, FileText, LogOut, Menu, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from './ui/button';
 
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/' },

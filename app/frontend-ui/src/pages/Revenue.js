@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "../context/AuthContext";
 
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Card } from "../components/ui/card";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -15,11 +15,11 @@ import {
   AlertDialogFooter,
   AlertDialogCancel,
   AlertDialogAction
-} from "@/components/ui/alert-dialog";
+} from "../components/ui/alert-dialog";
 
 import {
   Dialog, DialogContent, DialogTrigger
-} from "@/components/ui/dialog";
+} from "../components/ui/dialog";
 
 import { Plus, Edit, Trash2, Download } from "lucide-react";
 import { toast } from "sonner";

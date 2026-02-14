@@ -1,13 +1,13 @@
-import '@/App.css';
+import './App.css';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { Toaster } from '@/components/ui/sonner';
-import Login from '@/pages/Login';
-import Dashboard from '@/pages/Dashboard';
-import Revenue from '@/pages/Revenue';
-import Expenses from '@/pages/Expenses';
-import DailyReports from '@/pages/DailyReports';
-import Layout from '@/components/Layout';
-import { AuthProvider, useAuth } from '@/context/AuthContext';
+import { Toaster } from './components/ui/sonner';
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
+import Revenue from './pages/Revenue';
+import Expenses from './pages/Expenses';
+import DailyReports from './pages/DailyReports';
+import Layout from './components/Layout';
+import { AuthProvider, useAuth } from './context/AuthContext';
 
 const PrivateRoute = ({ children }) => {
   const { token } = useAuth();

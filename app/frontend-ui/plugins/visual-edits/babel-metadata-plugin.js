@@ -25,9 +25,9 @@ function resolveImportPath(source, fromFile) {
   if (RESOLVE_CACHE.has(cacheKey)) return RESOLVE_CACHE.get(cacheKey);
 
   let base;
-  if (source.startsWith("@/")) {
+  if (source.startsWith("./")) {
     base = path.join(SRC_ALIAS, source.slice(2));
-  } else if (source.startsWith("./") || source.startsWith("../")) {
+  } else if (source.startsWith("../")) {
     base = path.resolve(path.dirname(fromFile), source);
   } else {
     // bare specifier (node_modules) — skip analysis
@@ -536,7 +536,7 @@ const babelMetadataPlugin = ({ types: t }) => {
       const source = importDecl.source.value;
 
       // Only track @/ and ./ imports as potentially editable
-      if (source.startsWith("@/") || source.startsWith("./") || source.startsWith("../")) {
+      if (source.startsWith("./") || source.startsWith("./") || source.startsWith("../")) {
         const fileFrom = state.filename || state.file?.opts?.filename || __filename;
         const absPath = resolveImportPath(source, fileFrom);
 
