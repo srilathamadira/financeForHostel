@@ -51,6 +51,9 @@ db = client[DB_NAME]
 
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
+@app.get("/health")
+def health():
+    return {"status": "ok"}
 
 app.add_middleware(
     CORSMiddleware,
