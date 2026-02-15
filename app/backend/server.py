@@ -51,7 +51,7 @@ db = client[DB_NAME]
 
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
-@app.get("/health")
+@app.get("/health",methods=["GET","HEAD"])
 def health():
     return {"status": "ok"}
 
