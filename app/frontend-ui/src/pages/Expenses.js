@@ -261,7 +261,7 @@ onChange={e=>setFormData({...formData,remarks:e.target.value})}/>
 {/* ===== SUMMARY ===== */}
 
 <Card className="p-5 text-lg font-semibold">
-Total for {filterDate}: ₹ {totalFiltered.toFixed(2)}
+Total for {filterDate}: ₹ {totalFiltered.toLocaleString('en-IN',{minimumFractionDigits:2,minimumFractionDigits:2})}
 </Card>
 {/* ===== TABLE — UI IMPROVED ===== */}
 

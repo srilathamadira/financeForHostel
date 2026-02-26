@@ -229,7 +229,7 @@ export default function Revenue() {
 {/* PROFILE CARDS */}
 <div className="grid md:grid-cols-4 gap-5">
 <Card className="p-5"><div className="text-xs">Profile</div><div className="font-semibold">{user?.name}</div></Card>
-<Card className="p-5"><div className="text-xs">Revenue</div><div className="font-bold text-green-600">₹{totalSum.toFixed(2)}</div></Card>
+<Card className="p-5"><div className="text-xs">Revenue</div><div className="font-bold text-green-600">₹{totalSum.toLocaleString('en-IN',{minimumFractionDigits:2,minimumFractionDigits:2})}</div></Card>
 <Card className="p-5"><div className="text-xs">Entries</div><div className="font-bold">{entryCount}</div></Card>
 <Card className="p-5"><div className="text-xs">Viewing</div><div className="font-semibold">{activeMonth}</div></Card>
 </div>

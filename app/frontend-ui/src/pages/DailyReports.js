@@ -130,15 +130,15 @@ export default function DailyReports() {
                       </td>
 
                       <td className="text-green-600 font-semibold">
-                        ₹{r.total_revenue.toFixed(2)}
+                        ₹{r.total_revenue.toLocaleString('en-IN',{minimumFractionDigits:2,minimumFractionDigits:2})}
                       </td>
 
                       <td className="text-red-600 font-semibold">
-                        ₹{r.total_expenses.toFixed(2)}
+                        ₹{r.total_expenses.toLocaleString('en-IN',{minimumFractionDigits:2,minimumFractionDigits:2})}
                       </td>
 
                       <td className={profit ? "text-green-600 font-bold" : "text-red-600 font-bold"}>
-                        ₹{r.net_profit.toFixed(2)}
+                        ₹{r.net_profit.toLocaleString('en-IN',{minimumFractionDigits:2,minimumFractionDigits:2})}
                       </td>
 
                       <td>

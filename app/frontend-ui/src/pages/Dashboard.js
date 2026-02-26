@@ -189,18 +189,18 @@ export default function Dashboard() {
 
         <Card className="p-6 bg-white rounded-xl border border-[#E4E4E7]/50 shadow-sm">
           <p className="text-sm text-[#71717A]">Total Revenue</p>
-          <p className="text-3xl font-bold">₹{summary?.total_revenue?.toFixed(2) || '0.00'}</p>
+          <p className="text-3xl font-bold">₹{summary?.total_revenue?.toLocaleString('en-IN',{minimumFractionDigits:2,minimumFractionDigits:2}) || '0.00'}</p>
         </Card>
 
         <Card className="p-6 bg-white rounded-xl border border-[#E4E4E7]/50 shadow-sm">
           <p className="text-sm text-[#71717A]">Total Expenses</p>
-          <p className="text-3xl font-bold">₹{summary?.total_expenses?.toFixed(2) || '0.00'}</p>
+          <p className="text-3xl font-bold">₹{summary?.total_expenses?.toLocaleString('en-IN',{minimumFractionDigits:2,minimumFractionDigits:2}) || '0.00'}</p>
         </Card>
 
         <Card className="p-6 bg-white rounded-xl border border-[#E4E4E7]/50 shadow-sm">
           <p className="text-sm text-[#71717A]">Net Profit</p>
           <p className={`text-3xl font-bold ${isProfitable ? 'text-green-600' : 'text-red-600'}`}>
-            ₹{netProfit.toFixed(2)}
+            ₹{netProfit.toLocaleString('en-IN',{minimumFractionDigits:2,minimumFractionDigits:2})}
           </p>
         </Card>
 
