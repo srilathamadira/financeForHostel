@@ -318,12 +318,12 @@ Total ₹ {calcTotal().toFixed(2)}
 </td>
 
 <td className="p-4 text-slate-600">
-  ₹{r.cash_amount}
+  ₹{r.cash_amount.toLocaleString('en-IN',{minimumFractionDigits:2,minimumFractionDigits:2})}
 </td>
 
 <td className="p-4">
   <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 font-semibold">
-    ₹{r.total_revenue}
+    ₹{r.total_revenue.toLocaleString('en-IN',{minimumFractionDigits:2,minimumFractionDigits:2})}
   </span>
 </td>
 
