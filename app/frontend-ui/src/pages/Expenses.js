@@ -92,6 +92,13 @@ export default function Expenses() {
 
   /* ================= FILTER ================= */
 
+  // Picking a category shows ALL its past entries (date filter cleared).
+  // Picking "All" goes back to today's entries.
+  const handleCategoryChange = (value) => {
+    setFilterCategory(value);
+    setFilterDate(value === "all" ? today : "");
+  };
+
   const filtered = expenses.filter(e=>{
     const dateMatch = filterDate ? e.date === filterDate : true;
     const catMatch = filterCategory==="all" ? true : e.category===filterCategory;
@@ -184,15 +191,21 @@ export default function Expenses() {
 
 <div>
 <Label className="text-xs text-gray-500 mb-1">Filter Date</Label>
+<div className="flex gap-2">
 <Input type="date"
 value={filterDate}
 onChange={e=>setFilterDate(e.target.value)}
 className="w-56 h-11"/>
+<Button type="button" variant="outline" className="h-11"
+onClick={()=>setFilterDate("")}>
+All dates
+</Button>
+</div>
 </div>
 
 <div>
 <Label className="text-xs text-gray-500 mb-1">Category</Label>
-<Select value={filterCategory} onValueChange={setFilterCategory}>
+<Select value={filterCategory} onValueChange={handleCategoryChange}>
 <SelectTrigger className="w-60 h-11">
 <SelectValue placeholder="All Categories"/>
 </SelectTrigger>
@@ -261,7 +274,7 @@ onChange={e=>setFormData({...formData,remarks:e.target.value})}/>
 {/* ===== SUMMARY ===== */}
 
 <Card className="p-5 text-lg font-semibold">
-Total for {filterDate}: ₹ {totalFiltered.toLocaleString('en-IN',{minimumFractionDigits:2,minimumFractionDigits:2})}
+Total for {filterDate || "all dates"}{filterCategory!=="all" ? ` · ${filterCategory}` : ""}: ₹ {totalFiltered.toLocaleString('en-IN',{minimumFractionDigits:2,minimumFractionDigits:2})}
 </Card>
 {/* ===== TABLE — UI IMPROVED ===== */}
 
@@ -319,7 +332,7 @@ style={{background:CATEGORY_COLORS[e.category]}}
 </td>
 
 <td className="px-6 py-4 text-right font-semibold text-red-600">
-₹ {e.amount}
+₹ {e.amount.toLocaleString('en-IN',{minimumFractionDigits:2})}
 </td>
 
 <td className="px-6 py-4">

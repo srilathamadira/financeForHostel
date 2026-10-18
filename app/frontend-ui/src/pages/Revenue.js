@@ -40,6 +40,7 @@ const ACCOUNT_NAMES = [
 ];
 
 const ACCOUNT_COLORS = {
+  "CASH": "#0f172a",
   "NAYEEM PRIMARY": "#2563eb",
   "NAYEEM CURRENT": "#16a34a",
   "SUBHAN KHAN": "#f59e0b",
@@ -193,27 +194,43 @@ export default function Revenue() {
 
   /* ================= EXPORT ================= */
 
+  const getAmt = (r, name) => {
+    const f = r.contributions.find(c => c.name === name);
+    return f ? f.amount : 0;
+  };
+
+  const fmt = (n) =>
+    (n || 0).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
   const exportCSV = () => {
-    const rows = filtered.map(r =>
-      `${r.date},${r.cash_amount},${r.total_revenue}`
-    );
-    const blob = new Blob([["Date,Cash,Total", ...rows].join("\n")]);
+    const header = ["Date", "Cash", ...ACCOUNT_NAMES, "Total"];
+    const rows = filtered.map(r => [
+      r.date,
+      r.cash_amount,
+      ...ACCOUNT_NAMES.map(n => getAmt(r, n)),
+      r.total_revenue
+    ]);
+    const csv = [header, ...rows]
+      .map(row => row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(","))
+      .join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "revenue.csv";
+    a.download = `revenue_${dateFilter || "all"}.csv`;
     a.click();
   };
 
   /* ================= GRAPH ================= */
 
-  const graphData = ACCOUNT_NAMES.map(n => ({
-    name:n,
-    amount: filtered.reduce((s,r)=>{
-      const f=r.contributions.find(c=>c.name===n);
-      return s+(f?f.amount:0);
-    },0)
+  const totalCash = filtered.reduce((s, r) => s + (r.cash_amount || 0), 0);
+
+  const accountTotals = ACCOUNT_NAMES.map(n => ({
+    name: n,
+    amount: filtered.reduce((s, r) => s + getAmt(r, n), 0)
   }));
+
+  const graphData = [{ name: "CASH", amount: totalCash }, ...accountTotals];
 
   if (authLoading) return <div className="p-10 text-center">Loading...</div>;
 
@@ -224,7 +241,7 @@ export default function Revenue() {
   /* ================= UI ================= */
 
   return (
-<div className="max-w-5xl mx-auto px-6 py-8 space-y-8">
+<div className="max-w-7xl mx-auto px-6 py-8 space-y-8">
 
 {/* PROFILE CARDS */}
 <div className="grid md:grid-cols-4 gap-5">
@@ -283,76 +300,115 @@ Total ₹ {calcTotal().toFixed(2)}
 </div>
 </div>
 
-{/* ===== ENTRIES TABLE — PREMIUM UI ===== */}
-<Card className="p-0 overflow-hidden border shadow-md rounded-2xl">
+{/* ===== ENTRIES TABLE ===== */}
+<Card className="p-0 overflow-hidden border border-slate-200 shadow-sm rounded-2xl">
 
-<div className="px-6 py-5 border-b bg-gradient-to-r from-slate-900 to-slate-800">
-  <h2 className="text-lg font-semibold text-white">
-    All Revenue Entries
-  </h2>
+<div className="px-6 py-4 border-b bg-slate-900 flex items-center justify-between">
+  <h2 className="text-base font-semibold text-white">All Revenue Entries</h2>
+  <span className="text-xs font-medium text-slate-300 bg-white/10 px-3 py-1 rounded-full">
+    {entryCount} {entryCount === 1 ? "entry" : "entries"} · {activeMonth}
+  </span>
 </div>
 
-<div className="overflow-x-auto">
+<div className="overflow-auto max-h-[70vh] border-t border-slate-200">
 
-<table className="w-full text-sm">
+<table className="w-full min-w-[1150px] text-sm border-separate border-spacing-0">
 
-<thead className="bg-slate-50 text-slate-600">
-<tr>
-<th className="p-4 text-left font-semibold">Date</th>
-<th className="p-4 text-left font-semibold">Cash</th>
-<th className="p-4 text-left font-semibold">Total</th>
-<th className="p-4 text-left font-semibold">Actions</th>
+<thead>
+<tr className="text-[11px] uppercase tracking-wider text-slate-500">
+<th className="sticky top-0 left-0 z-30 bg-slate-100 border-b border-r border-slate-300 px-4 py-3 text-left font-semibold whitespace-nowrap">Date</th>
+<th className="sticky top-0 z-20 bg-slate-100 border-b border-r border-slate-300 px-4 py-3 text-right font-semibold whitespace-nowrap">
+<span className="inline-flex items-center gap-1.5">
+<span className="w-2 h-2 rounded-full" style={{background:ACCOUNT_COLORS["CASH"]}}/>Cash
+</span>
+</th>
+{ACCOUNT_NAMES.map(n=>(
+<th key={n} className="sticky top-0 z-20 bg-slate-100 border-b border-r border-slate-300 px-4 py-3 text-right font-semibold whitespace-nowrap">
+<span className="inline-flex items-center gap-1.5">
+<span className="w-2 h-2 rounded-full" style={{background:ACCOUNT_COLORS[n]}}/>{n}
+</span>
+</th>
+))}
+<th className="sticky top-0 z-20 bg-slate-100 border-b border-r border-slate-300 px-4 py-3 text-right font-semibold whitespace-nowrap">Total</th>
+<th className="sticky top-0 right-0 z-30 bg-slate-100 border-b border-r border-slate-300 px-4 py-3 text-center font-semibold whitespace-nowrap">Actions</th>
 </tr>
 </thead>
 
 <tbody>
 
-{filtered.map((r, i) => (
-<tr
-  key={r.id}
-  className="border-t hover:bg-slate-50 transition-colors"
->
+{filtered.map((r)=>{
+  const d = new Date(r.date + "T00:00:00");
+  const dateLabel = isNaN(d) ? r.date : d.toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});
+  const dayLabel = isNaN(d) ? "" : d.toLocaleDateString("en-IN",{weekday:"short"});
 
-<td className="p-4 font-medium text-slate-700">
-  {r.date}
+  return (
+<tr key={r.id} className="bg-white even:bg-slate-50 hover:bg-blue-50 transition-colors">
+
+<td className="sticky left-0 z-10 bg-inherit border-b border-r border-slate-200 px-4 py-3 whitespace-nowrap">
+  <div className="font-semibold text-slate-800">{dateLabel}</div>
+  <div className="text-xs text-slate-400">{dayLabel}</div>
 </td>
 
-<td className="p-4 text-slate-600">
-  ₹{r.cash_amount.toLocaleString('en-IN',{minimumFractionDigits:2,minimumFractionDigits:2})}
+<td className="border-b border-r border-slate-200 px-4 py-3 text-right tabular-nums whitespace-nowrap">
+  {r.cash_amount
+    ? <span className="font-medium text-slate-800">₹{fmt(r.cash_amount)}</span>
+    : <span className="text-slate-300">–</span>}
 </td>
 
-<td className="p-4">
-  <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 font-semibold">
-    ₹{r.total_revenue.toLocaleString('en-IN',{minimumFractionDigits:2,minimumFractionDigits:2})}
+{ACCOUNT_NAMES.map(n=>{
+  const v = getAmt(r, n);
+  return (
+    <td key={n} className="border-b border-r border-slate-200 px-4 py-3 text-right tabular-nums whitespace-nowrap">
+      {v
+        ? <span className="font-medium text-slate-800">₹{fmt(v)}</span>
+        : <span className="text-slate-300">–</span>}
+    </td>
+  );
+})}
+
+<td className="border-b border-r border-slate-200 px-4 py-3 text-right whitespace-nowrap">
+  <span className="inline-block px-3 py-1 rounded-full bg-green-100 text-green-700 font-bold tabular-nums">
+    ₹{fmt(r.total_revenue)}
   </span>
 </td>
 
-<td className="p-4">
-  <div className="flex gap-2">
-
-    <Button
-      size="sm"
-      className="bg-slate-900 hover:bg-slate-700 text-white rounded-lg"
-      onClick={() => editRow(r)}
-    >
-      <Edit className="w-4 h-4" />
+<td className="sticky right-0 z-10 bg-inherit border-b border-r border-slate-200 px-3 py-3">
+  <div className="flex justify-center gap-1">
+    <Button size="icon" variant="ghost" className="h-8 w-8 hover:bg-blue-100" onClick={() => editRow(r)}>
+      <Edit className="w-4 h-4 text-blue-600" />
     </Button>
-
-    <Button
-      size="sm"
-      className="bg-red-500 hover:bg-red-600 text-white rounded-lg"
-      onClick={() => setDeleteId(r.id)}
-    >
-      <Trash2 className="w-4 h-4" />
+    <Button size="icon" variant="ghost" className="h-8 w-8 hover:bg-red-100" onClick={() => setDeleteId(r.id)}>
+      <Trash2 className="w-4 h-4 text-red-600" />
     </Button>
-
   </div>
 </td>
 
 </tr>
-))}
+  );
+})}
+
+{filtered.length === 0 && (
+<tr>
+<td colSpan={ACCOUNT_NAMES.length + 4} className="text-center py-12 text-slate-500">
+No revenue entries found
+</td>
+</tr>
+)}
 
 </tbody>
+
+<tfoot>
+<tr className="bg-slate-900 text-white font-bold">
+<td className="sticky bottom-0 left-0 z-20 bg-slate-900 border-r border-slate-700 px-4 py-3.5 whitespace-nowrap">TOTAL</td>
+<td className="sticky bottom-0 z-10 bg-slate-900 border-r border-slate-700 px-4 py-3.5 text-right tabular-nums whitespace-nowrap">₹{fmt(totalCash)}</td>
+{accountTotals.map(a=>(
+<td key={a.name} className="sticky bottom-0 z-10 bg-slate-900 border-r border-slate-700 px-4 py-3.5 text-right tabular-nums whitespace-nowrap">₹{fmt(a.amount)}</td>
+))}
+<td className="sticky bottom-0 z-10 bg-slate-900 border-r border-slate-700 px-4 py-3.5 text-right tabular-nums whitespace-nowrap text-green-400">₹{fmt(totalSum)}</td>
+<td className="sticky bottom-0 right-0 z-20 bg-slate-900 border-r border-slate-700 px-4 py-3.5"></td>
+</tr>
+</tfoot>
+
 </table>
 
 </div>
@@ -361,7 +417,7 @@ Total ₹ {calcTotal().toFixed(2)}
 
 {/* ACCOUNT GRAPH */}
 <Card className="p-6">
-<h2 className="font-semibold mb-3">Account Contributions</h2>
+<h2 className="font-semibold mb-3">Cash &amp; Account-wise Revenue ({activeMonth})</h2>
 <ResponsiveContainer width="100%" height={280}>
 <BarChart data={graphData}>
 <XAxis dataKey="name"/>

@@ -23,7 +23,8 @@ from fastapi.responses import StreamingResponse
 from io import BytesIO
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from datetime import datetime
-from report_excel import build_excel
+import re
+from report_excel import build_excel, build_full_report_bytes, build_full_report_file
 from mailer import send_report
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from datetime import datetime
@@ -141,36 +142,42 @@ async def get_current_user(
 
     raise HTTPException(401, "Invalid user")
 
-async def monthly_report_job():
+async def collect_report_data(month: str):
+    """Totals, revenue per account (incl. cash) and expenses per category for a month."""
 
-    now = datetime.now()
-    month = now.strftime("%Y-%m")
+    q = {"date": {"$regex": f"^{re.escape(month)}"}}
 
-    match = {"date": {"$regex": f"^{month}"}}
+    revenues = await db.revenue.find(q, {"_id": 0}).to_list(5000)
+    expenses = await db.expenses.find(q, {"_id": 0}).to_list(5000)
 
-    rev = await db.revenue.aggregate([
-        {"$match": match},
-        {"$group": {"_id": None, "t": {"$sum": "$total_revenue"}}}
-    ]).to_list(1)
+    sources = {}
+    sources["CASH"] = sum(float(r.get("cash_amount", 0) or 0) for r in revenues)
+    for r in revenues:
+        for c in r.get("contributions", []):
+            sources[c["name"]] = sources.get(c["name"], 0) + float(c.get("amount", 0) or 0)
 
-    exp = await db.expenses.aggregate([
-        {"$match": match},
-        {"$group": {"_id": None, "t": {"$sum": "$amount"}}}
-    ]).to_list(1)
+    cats = {}
+    for e in expenses:
+        cats[e.get("category") or "Other"] = cats.get(e.get("category") or "Other", 0) + float(e.get("amount", 0) or 0)
 
-    cat = await db.expenses.aggregate([
-        {"$match": match},
-        {"$group": {"_id": "$category", "total": {"$sum": "$amount"}}}
-    ]).to_list(100)
+    total_revenue = sum(float(r.get("total_revenue", 0) or 0) for r in revenues)
+    total_expenses = sum(cats.values())
 
-    summary = {
-        "total_revenue": rev[0]["t"] if rev else 0,
-        "total_expenses": exp[0]["t"] if exp else 0,
-        "net_profit": (rev[0]["t"] if rev else 0) - (exp[0]["t"] if exp else 0),
-        "category_data": [{"name": c["_id"], "value": c["total"]} for c in cat]
+    return {
+        "total_revenue": total_revenue,
+        "total_expenses": total_expenses,
+        "net_profit": total_revenue - total_expenses,
+        "sources": sources,
+        "categories": [{"name": k, "value": v} for k, v in cats.items()],
     }
 
-    file_path = build_excel(summary, month)
+
+async def monthly_report_job():
+
+    month = datetime.now().strftime("%Y-%m")
+
+    data = await collect_report_data(month)
+    file_path = build_full_report_file(data, month)
 
     # ✅ SEND ONLY TO PREDEFINED USERS
     for u in FIXED_USERS.values():
@@ -581,6 +588,21 @@ async def monthly_summary(month: str, user=Depends(get_current_user)):
         category_data=[{"name": c["_id"], "value": c["total"]} for c in cat],
         revenue_data=revenue_data
     )
+@api_router.get("/reports/full-export")
+async def full_report_export(month: str, user=Depends(get_current_user)):
+
+    data = await collect_report_data(month)
+    stream = build_full_report_bytes(data, month)
+
+    return StreamingResponse(
+        stream,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={
+            "Content-Disposition": f"attachment; filename=full_report_{month}.xlsx"
+        },
+    )
+
+
 @api_router.get("/test-mail")
 async def test_mail():
 
